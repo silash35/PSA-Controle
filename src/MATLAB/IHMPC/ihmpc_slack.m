@@ -4,18 +4,18 @@ clc
 
 % Ponto de operação em variavel de engenharia
 % Usado como referência para definição de variáveis em desvio.
-y_ref = [66.61255271 89.50113667 93.26343938]';
+y_ref = [66.61004379 89.78125133 94.01663713]';
 u_ref = [680 265 130 80]';
 
 % MPC model
 Ts = 1;
-Atil = [ 0.37067676 0.03019531 0.01725641
-    0.68652094 0.57037991 0.02130872
-    2.46894109 1.32869029 0.0664796  ];
+Atil = [ 0.2792203   0.02763794  0.01117108
+    0.57325222  0.48250734  0.01838668
+    2.10240983  1.34213896 -0.05194512];
 
-Btil = [ -0.00726326 -0.01558     0.00369239  0.02208961
-    0.01693359  0.05265305  0.01081026 -0.07745152
-    -0.0253843  -0.09184406  0.04534568  0.24170092 ];
+Btil = [-0.00843015 -0.01770224  0.00648659  0.02642573
+    0.01754253  0.05775458  0.01223204 -0.08700032
+    -0.03213628 -0.10387186  0.05116795  0.26545967];
 
 Ctil = eye(3);
 Dtil = zeros(size(Ctil,1), size(Btil,2));
@@ -141,10 +141,11 @@ for in=1:nsim
     Beq = ysp-xmk(1:ny);
 
     % options = optimset('display','iter')
+    H=(H+H')/2;
     [dd,fvin,flagin]=quadprog(H,cf,Aineq,Bineq,Aeq,Beq);
 
     % storing calculated data
-    fval(in) = dd'*H*dd + 2*cf*dd + c  ; % control cost value
+    Jk(in) = dd'*H*dd + 2*cf*dd + c  ; % control cost value
     flag(in) = flagin                  ; % exitflag of exit condition of the MATLAB's quadprog routine
     duuk(:,in) = dd(1:m*nu)            ; % prediction of input moves
     sky(:,in)=dd(nu*m+1:m*nu+ny)       ; % slacks of outputs
@@ -184,7 +185,7 @@ for j=1:nc
 end
 
 figure(3)
-plot(fval)
+plot(Jk)
 xlabel('tempo nT')
 ylabel('Cost function')
 
@@ -209,4 +210,4 @@ uk = ur;
 yk = yr;
 ysp = yspp;
 
-save('output.mat', 'uk', 'yk', 'ysp');
+save('output.mat', 'uk', 'yk', 'ysp', 'Jk');
