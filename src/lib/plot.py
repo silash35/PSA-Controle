@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 
-from .read_data import u_labels, y_labels
+from .read_data import y_labels
 
 colors = list(mcolors.TABLEAU_COLORS.keys())
 
@@ -46,44 +46,4 @@ def plot_comparison(cycles, real_y, model_y, model_name):
 
     # plt.show()
     plt.savefig(f"../figures/comparision-{model_name}.png")
-    plt.close()
-
-
-def plot_control(cycles, u, y, sp, model_name: str):
-    # --- Criar subplots ---
-    _, axes = plt.subplots(
-        4,
-        1,
-        sharex=True,
-        figsize=(16, 9),
-        dpi=300,
-        height_ratios=[1, 0.5, 0.5, 0.5],
-    )
-
-    # Entradas
-    for i in range(len(u_labels)):
-        axes[0].plot(cycles, u[:, i], label=u_labels[i])
-
-    axes[0].set_ylabel("Duração da etapa / s")
-
-    # Saídas
-    for i in range(len(y_labels)):
-        ax = axes[i + 1]
-        ax.plot(cycles, y[:, i], label=y_labels[i], color=colors[i])
-        ax.plot(
-            cycles,
-            sp[:, i],
-            linestyle="--",
-            color=colors[i],
-            label=f"{y_labels[i]} (SP)",
-        )
-        ax.set_ylabel("KPI / %")
-
-    axes[-1].set_xlabel("Ciclo")
-    for ax in axes:
-        legend_outside(ax)
-        ax.grid(True)
-
-    plt.tight_layout()
-    plt.savefig(f"../figures/{model_name}.png")
     plt.close()
