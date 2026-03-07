@@ -25,10 +25,10 @@ Ctil = eye(3);
 Dtil = zeros(size(Ctil,1), size(Btil,2));
 
 sysd = ss(Atil, Btil, Ctil, Dtil, Ts);
-Gz = tf(sysd);
+Gs = d2c(tf(sysd));
 
-
-[A,B,C,D0,Dd,F,Psi,N]=opom(Gz); % it creates opom model
+%%
+[A,B,C,D0,Dd,F,Psi,N]=opom(Gs,Ts); % it creates opom model
 Ap=A*1.00; Bp=B*1.05; Cp=C;
 ny = size(C,1); % output variables of the system
 nu = size(B,2); % input variables of the system
@@ -42,7 +42,7 @@ nsim = 200;      % simulation time
 m = 5;           % control horizon
 qy = [1 1 1];      % output weights
 qu = [];      % output weights
-r  = [0.2 0.5 0.5 0.5]; % move weights
+r  = [0.2 0.5 0.5 1.0]; % move weights
 
 umax=[715 265 140 115]' - u_ref; % maximum value for inputs
 umin=[600 187 130 80]' - u_ref; % minimum value for inputs
@@ -100,6 +100,7 @@ end
 % creating the H matrix of QP
 H = [(Dm0+Fu)'*Qybar*(Dm0+Fu)+Futil'*Qbar*Futil+Rbar -(Dm0+Fu)'*Qybar*Ibar
     -Ibar'*Qybar*(Dm0+Fu)                           Ibar'*Qybar*Ibar+S];
+H = real(H);
 
 % defining the initial conditions
 % =========================================================================
@@ -129,6 +130,7 @@ for in=1:nsim
     cf = [(Ibar*xmk(1:ny)+Fx*xmk(ny+1:end)-Ibar*ysp)'*Qybar*Dm0+...
         (Ibar*xmk(1:ny)+Fx*xmk(ny+1:end)-Ibar*ysp)'*Qybar*Fu+(F^m*xmk(ny+1:end))'*Qbar*Futil ...
         (Ibar*ysp-Fx*xmk(ny+1:end)-Ibar*xmk(1:ny))'*Qybar*Ibar];
+    cf = real(cf);
     c = (Ibar*xmk(1:ny)+Fx*xmk(ny+1:end)-Ibar*ysp)'*Qybar*(Ibar*xmk(1:ny)+Fx*xmk(ny+1:end)-Ibar*ysp)+...
         (F^m*xmk(ny+1:end))'*Qbar*(F^m*xmk(ny+1:end));
 
@@ -163,7 +165,7 @@ for in=1:nsim
     % ymk=C*xmk;
     yspp=[yspp ysp];
 end
-
+%%
 nc=size(yr,1);
 figure(1)
 for j=1:nc
@@ -189,7 +191,7 @@ for j=1:nc
 end
 
 figure(3)
-plot(Jk)
+plot(real(Jk))
 xlabel('tempo nT')
 ylabel('Cost function')
 

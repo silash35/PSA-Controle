@@ -33,11 +33,11 @@ Ap=A*1.00; Bp=B*1.05; Cp=C; % defining plant model
 nx=size(A,1); % Number of system states
 
 % tuning parameters of MPC
-p=120       ; % Output prediction horizon
+p=50       ; % Output prediction horizon
 m=5         ; % Input horizon
 nsim=200    ; % Simulation time in sampling periods
 q=[1,1,1]   ; % Output weights
-r=[0.2 0.5 0.5 0.5] ; % Input moves weights
+r=[0.2 0.5 0.5 1.0]; % Input moves weights
 
 umax=[715 265 140 115]' - u_ref; % maximum value for inputs
 umin=[600 187 130 80]' - u_ref; % minimum value for inputs
